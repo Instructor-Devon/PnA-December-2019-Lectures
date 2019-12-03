@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
+  <title>Github Users</title>
+
+  <style>
+      .error {
+      border: 2px solid red;
+      background-color: black;
+      color: crimson;
+      min-height: 100px;
+      padding: 10px;
+    }
+
+    .error p {
+      text-align: center;
+      font-size: 30px;
+    }
+
+    .input {
+      width: 100%;
+      border: 3px solid green;
+    }
+
+    .search {
+      min-height: 25px;
+    }
+
+    .user-input {
+      margin: 10px 0px;
+      text-align: center;
+    }
+
+    button.search {
+      height: 55px;
+      width: 500px;
+      margin: 5px;
+    }
+
+    .card {
+      border: 1px solid black;
+    }
+
+  
+  </style>
+
+  <script>
+    //  https://api.github.com/users/dojo-json
+
+    $(document).ready(function() {
+
+      $('#search-button').click(function() {
+        const input = $('#user-name').first();
+        const name = input.val().trim();
+
+        $('.user-content').first().hide();
+
+        input.val('');
+
+        if (name) {
+          return search(name);
+        }
+
+        displayError('You must provide a username!');
+      });
+
+
+      function search(name) {
+        $('#error-section').hide();
+
+        $.get({
+          url: `https://api.github.com/users/${name}`,
+          success: createCard,
+          error: function(error) {
+            displayError(`Something went wrong, ensure the user you are requesting exists: ${name}`);
+          }
+        });
+      }
+
+      function createCard(user) {
+        const element = `
+          <div #='card' class='card'>
+            <img class='img avatar' src='${user.avatar_url}' alt='avatar'>
+            <p>Login: ${user.login}</p>
+            <p>Name: ${user.name || 'N/A'}</p>
+            <p>Repos: ${user.public_repos}</p>
+            <p>Gists: ${user.public_gists}</p>
+          </div>
+        `;
+
+          $('.user-content').first().empty().show().append(element);
+      }
+
+      function displayError(message) {
+        $('#error-section')
+          .empty()
+          .show()
+          .append(`<p>${message}</p>`);
+      }
+
+    });
+  </script>
+</head>
+<body>
+    <main>
+      <section id="error-section" class="error" hidden='true'></section>
+
+      <section class="user-input">
+        <input type="text" id="user-name" class="search input" placeholder='github username'>
+        <button id="search-button" class="search">Search</button>
+      </section>
+
+      <section class="user-content"></section>
+    </main>
+</body>
+</html>
